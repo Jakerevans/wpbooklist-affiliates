@@ -74,14 +74,7 @@ function wpbooklist_affiliate_action_callback(){
 	$where_format = array( '%d' );
 	$wpdb->update( $table_name_options, $data, $where, $format, $where_format );
 
-	// Require the Transients file.
-	require_once CLASS_TRANSIENTS_DIR . 'class-wpbooklist-transients.php';
-	$transients = new WPBookList_Transients();
-
-	// Now delete all WPBL transients, to make sure we get the Affiliate ID into the Amazon Links.
-	$transient_deleteall_result = $transients->delete_all_wpbl_transients();
-
-	wp_die( $transient_deleteall_result );
+	wp_die();
 }
 
 
