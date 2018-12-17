@@ -1,1 +1,1 @@
-# WPBookList Affiliate Extension
+# WPBookList-EBMP
