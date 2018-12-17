@@ -18,16 +18,6 @@ if ( ! class_exists( 'Affiliates_Ajax_Functions', false ) ) :
 	 */
 	class Affiliates_Ajax_Functions {
 
-		/**
-		 * Class Constructor
-		 */
-		public function __construct() {
-
-			// Get Translations.
-			require_once ROOT_WPBL_TRANSLATIONS_DIR . 'class-wpbooklist-translations.php';
-			$this->trans = new WPBookList_Translations();
-			$this->trans->trans_strings();
-		}
 
 		/**
 		 * Callback function for saving Affiliate IDs.
@@ -44,6 +34,11 @@ if ( ! class_exists( 'Affiliates_Ajax_Functions', false ) ) :
 			if ( isset( $_POST['amazonaff'] ) ) {
 				$amazon_aff = filter_var( wp_unslash( $_POST['amazonaff'] ), FILTER_SANITIZE_STRING );
 			}
+
+			// Get Translations.
+			require_once ROOT_WPBL_TRANSLATIONS_DIR . 'class-wpbooklist-translations.php';
+			$this->trans = new WPBookList_Translations();
+			$this->trans->trans_strings();
 
 			if ( $this->trans->trans_631 . '...' === $itunes_aff ) {
 				$itunes_aff = '1010lnPx';
