@@ -23,20 +23,27 @@ if ( ! class_exists( 'WPBookList_Affiliate_Tab', false ) ) :
 		 */
 		public function __construct() {
 
-			// This extension relies on the admin template file in the core WPBookList plugin.
-			require_once( CLASS_DIR . 'class-admin-ui-template.php' );
+			global $wpdb;
 
-			// Instantiate the class.
-			$this->template = new WPBookList_Admin_UI_Template();
+			$this->extension_settings = $wpdb->get_row( 'SELECT * FROM ' . $wpdb->prefix . 'wpbooklist_affiliates_settings' );
 
-			// Require the file that contains the actual code that will be output within the admin template.
-			require_once( AFFILIATES_CLASS_DIR . 'class-wpbooklist-affiliates-form.php' );
-			$this->form = new WPBookList_Affiliates_Form();
+			if ( false !== stripos( $this->extension_settings->repw, 'aod' ) ) {
 
-			$this->output_open_admin_container();
-			$this->output_tab_content();
-			$this->output_close_admin_container();
-			$this->output_admin_template_advert();
+				// This extension relies on the admin template file in the core WPBookList plugin.
+				require_once( CLASS_DIR . 'class-admin-ui-template.php' );
+
+				// Instantiate the class.
+				$this->template = new WPBookList_Admin_UI_Template();
+
+				// Require the file that contains the actual code that will be output within the admin template.
+				require_once( AFFILIATES_CLASS_DIR . 'class-wpbooklist-affiliates-form.php' );
+				$this->form = new WPBookList_Affiliates_Form();
+
+				$this->output_open_admin_container();
+				$this->output_tab_content();
+				$this->output_close_admin_container();
+				$this->output_admin_template_advert();
+			}
 		}
 
 		/**

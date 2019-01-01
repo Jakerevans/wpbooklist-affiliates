@@ -52,48 +52,187 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 		 *
 		 * @param  array $plugins List of plugins to activate & load.
 		 */
-		public function wpbooklist_affiliates_verify_license( $plugins ) {
+		public function wpbooklist_affiliates_verify_license() {
 
 			global $wpdb;
 
 			// Get license key from plugin options, if it's already been saved. If it has, don't display anything.
 			$this->extension_settings = $wpdb->get_row( 'SELECT * FROM ' . $wpdb->prefix . 'wpbooklist_affiliates_settings' );
 
-			$unnecessary_plugins[] = 'wpbooklist-affiliates/wpbooklist-affiliates.php';
-
 			// If the License Key just hasn't been entered yet...
-			if ( null === $this->extension_settings->license || '' === $this->extension_settings->license ) {
-
-				foreach ( $unnecessary_plugins as $plugin ) {
-					$k = array_search( $plugin, $plugins );
-					if ( false !== $k ) {
-						unset( $plugins[ $k ] );
-					}
-				}
-
-				return $plugins;
-
+			if ( null === $this->extension_settings->repw || '' === $this->extension_settings->repw ) {
+				return;
 			} else {
 
-				// If a License key has been saved, let's verify it, and if it's not good, don't load the plugin.
-				$license_good_flag = true;
+				if ( false !== stripos( $this->extension_settings->repw, '---' ) ) {
 
-				if ( $license_good_flag ) {
+					$temp = explode( '---', $this->extension_settings->repw );
 
-					// Add the tab into the Settings page.
-					add_filter( 'wpbooklist_add_tab_settings', array( $this, 'wpbooklist_affiliate_tab' ) );
-					return $plugins;
+					if ( 'aod' === $temp[1] ) {
+
+						// Get the date.
+						require_once ROOT_WPBL_UTILITIES_DIR . 'class-wpbooklist-utilities-date.php';
+						$utilities_date = new WPBookList_Utilities_Date();
+						$this->date     = $utilities_date->wpbooklist_get_date_via_current_time( 'timestamp' );
+
+						if ( 604800 < ( $this->date - (int) $temp[2] ) ) {
+
+							$checker_good_flag = false;
+
+							$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=46&license=' . $temp[0] . '&url=' . get_site_url() );
+
+							// Check the response code.
+							$response_code    = wp_remote_retrieve_response_code( $san_check );
+							$response_message = wp_remote_retrieve_response_message( $san_check );
+
+							if ( 200 !== $response_code && ! empty( $response_message ) ) {
+								return new WP_Error( $response_code, $response_message );
+							} elseif ( 200 !== $response_code ) {
+								$this->apireport = $this->apireport . 'Unknown error occurred with wp_remote_get() trying to build Books-a-Million link in the create_buy_links() function ';
+								return new WP_Error( $response_code, 'Unknown error occurred with wp_remote_get() trying to build Books-a-Million link in the create_buy_links() function' );
+							} else {
+								$san_check = wp_remote_retrieve_body( $san_check );
+								$san_check = json_decode( $san_check, true );
+
+								if ( 'valid' === $san_check['license'] && $san_check['success'] ) {
+
+									$this->date = $utilities_date->wpbooklist_get_date_via_current_time( 'timestamp' );
+
+									$data         = array(
+										'repw' => $temp[0] . '---aod---' . $this->date,
+									);
+									$format       = array( '%s' );
+									$where        = array( 'ID' => 1 );
+									$where_format = array( '%d' );
+									$save_result = $wpdb->update( $wpdb->prefix . 'wpbooklist_affiliates_settings', $data, $where, $format, $where_format );
+
+									$checker_good_flag = true;
+								} else {
+									$data         = array(
+										'repw' => '',
+									);
+									$format       = array( '%s' );
+									$where        = array( 'ID' => 1 );
+									$where_format = array( '%d' );
+									$save_result = $wpdb->update( $wpdb->prefix . 'wpbooklist_affiliates_settings', $data, $where, $format, $where_format );
+								}
+							}
+
+							if ( ! $checker_good_flag ) {
+								deactivate_plugins( AFFILIATES_ROOT_DIR . 'wpbooklist-affiliates.php' );
+								return;
+							}
+						} else {
+							return;
+						}
+					} else {
+
+						$checker_good_flag = false;
+
+						$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=46&license=' . $this->extension_settings->repw . '&url=' . get_site_url() );
+
+						// Check the response code.
+						$response_code    = wp_remote_retrieve_response_code( $san_check );
+						$response_message = wp_remote_retrieve_response_message( $san_check );
+
+						if ( 200 !== $response_code && ! empty( $response_message ) ) {
+							return new WP_Error( $response_code, $response_message );
+						} elseif ( 200 !== $response_code ) {
+							$this->apireport = $this->apireport . 'Unknown error occurred with wp_remote_get() trying to build Books-a-Million link in the create_buy_links() function ';
+							return new WP_Error( $response_code, 'Unknown error occurred with wp_remote_get() trying to build Books-a-Million link in the create_buy_links() function' );
+						} else {
+							$san_check = wp_remote_retrieve_body( $san_check );
+							$san_check = json_decode( $san_check, true );
+
+							if ( 'valid' === $san_check['license'] && $san_check['success'] ) {
+
+								// Get the date.
+								require_once ROOT_WPBL_UTILITIES_DIR . 'class-wpbooklist-utilities-date.php';
+								$utilities_date = new WPBookList_Utilities_Date();
+								$this->date     = $utilities_date->wpbooklist_get_date_via_current_time( 'timestamp' );
+
+								$data         = array(
+									$san_checkthis->extension_settings->repw . '---aod---' . $this->date,
+								);
+								$format       = array( '%s' );
+								$where        = array( 'ID' => 1 );
+								$where_format = array( '%d' );
+								$save_result = $wpdb->update( $wpdb->prefix . 'wpbooklist_affiliates_settings', $data, $where, $format, $where_format );
+
+								$checker_good_flag = true;
+
+							} else {
+								$data         = array(
+									'repw' => '',
+								);
+								$format       = array( '%s' );
+								$where        = array( 'ID' => 1 );
+								$where_format = array( '%d' );
+								$save_result = $wpdb->update( $wpdb->prefix . 'wpbooklist_affiliates_settings', $data, $where, $format, $where_format );
+							}
+						}
+
+						if ( ! $checker_good_flag ) {
+							deactivate_plugins( AFFILIATES_ROOT_DIR . 'wpbooklist-affiliates.php' );
+							return;
+						}
+					}
 				} else {
 
-					foreach ( $unnecessary_plugins as $plugin ) {
-						$k = array_affiliates( $plugin, $plugins );
-						if ( false !== $k ) {
-							unset( $plugins[ $k ] );
+					$checker_good_flag = false;
+
+					$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=46&license=' . $this->extension_settings->repw . '&url=' . get_site_url() );
+
+					// Check the response code.
+					$response_code    = wp_remote_retrieve_response_code( $san_check );
+					$response_message = wp_remote_retrieve_response_message( $san_check );
+
+					if ( 200 !== $response_code && ! empty( $response_message ) ) {
+						return new WP_Error( $response_code, $response_message );
+					} elseif ( 200 !== $response_code ) {
+						$this->apireport = $this->apireport . 'Unknown error occurred with wp_remote_get() trying to build Books-a-Million link in the create_buy_links() function ';
+						return new WP_Error( $response_code, 'Unknown error occurred with wp_remote_get() trying to build Books-a-Million link in the create_buy_links() function' );
+					} else {
+						$san_check = wp_remote_retrieve_body( $san_check );
+						$san_check = json_decode( $san_check, true );
+
+						if ( 'valid' === $san_check['license'] && $san_check['success'] ) {
+
+							// Get the date.
+							require_once ROOT_WPBL_UTILITIES_DIR . 'class-wpbooklist-utilities-date.php';
+							$utilities_date = new WPBookList_Utilities_Date();
+							$this->date     = $utilities_date->wpbooklist_get_date_via_current_time( 'timestamp' );
+
+							$data         = array(
+								'repw' => $this->extension_settings->repw . '---aod---' . $this->date,
+							);
+							$format       = array( '%s' );
+							$where        = array( 'ID' => 1 );
+							$where_format = array( '%d' );
+							$save_result = $wpdb->update( $wpdb->prefix . 'wpbooklist_affiliates_settings', $data, $where, $format, $where_format );
+
+							$checker_good_flag = true;
+
+						} else {
+							$data         = array(
+								'repw' => '',
+							);
+							$format       = array( '%s' );
+							$where        = array( 'ID' => 1 );
+							$where_format = array( '%d' );
+							$save_result = $wpdb->update( $wpdb->prefix . 'wpbooklist_affiliates_settings', $data, $where, $format, $where_format );
 						}
 					}
 
-					return $plugins;
+					if ( ! $checker_good_flag ) {
+						deactivate_plugins( AFFILIATES_ROOT_DIR . 'wpbooklist-affiliates.php' );
 
+						if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+							//header( 'Location: ' . filter_var( wp_unslash( $_SERVER['REQUEST_URI'] ), FILTER_SANITIZE_STRING ) );
+						}
+
+						return;
+					}
 				}
 			}
 		}
@@ -104,29 +243,34 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 		 * @param  array $links List of existing plugin action links.
 		 * @return array List of modified plugin action links.
 		 */
-		public function wpbooklist_affiliates_pluginspage_license_entry( $links ) {
+		public function wpbooklist_affiliates_pluginspage_nonce_entry( $links ) {
 
 			global $wpdb;
 
 			require_once ROOT_WPBL_TRANSLATIONS_DIR . 'class-wpbooklist-translations.php';
 			$trans = new WPBookList_Translations();
 
-			// Get license key from plugin options, if it's already been saved. If it has, don't display anything.
 			$this->extension_settings = $wpdb->get_row( 'SELECT * FROM ' . $wpdb->prefix . 'wpbooklist_affiliates_settings' );
 
-			if ( null === $this->extension_settings->license || '' === $this->extension_settings->license ) {
+			if ( null === $this->extension_settings->repw || '' === $this->extension_settings->repw ) {
 				$value = $trans->trans_613;
 			} else {
-				$value = $this->extension_settings->license;
+
+				if ( false !== stripos( $this->extension_settings->repw, '---' ) ) {
+					$temp  = explode( '---', $this->extension_settings->repw );
+					$value = $temp[0];
+				} else {
+					$value = $this->extension_settings->repw;
+				}
 			}
 
-			$license_html = '
+			$form_html = '
 				<form>
-					<input id="wpbooklist-extension-licence-key-plugins-page-input-affiliates" class="wpbooklist-extension-licence-key-plugins-page-input" type="text" placeholder="' . $trans->trans_613 . '" value="' . $value . '"></input>
-					<button id="wpbooklist-extension-licence-key-plugins-page-button-affiliates" class="wpbooklist-extension-licence-key-plugins-page-button">' . $trans->trans_614 . '</button>
+					<input id="wpbooklist-extension-genreric-key-plugins-page-input-affiliates" class="wpbooklist-extension-genreric-key-plugins-page-input" type="text" placeholder="' . $trans->trans_613 . '" value="' . $value . '"></input>
+					<button id="wpbooklist-extension-genreric-key-plugins-page-button-affiliates" class="wpbooklist-extension-genreric-key-plugins-page-button">' . $trans->trans_614 . '</button>
 				</form>';
 
-			array_push( $links, $license_html );
+			array_push( $links, $form_html );
 
 			return $links;
 
@@ -142,17 +286,17 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 			// Get license key from plugin options, if it's already been saved. If it has, don't display anything.
 			$this->extension_settings = $wpdb->get_row( 'SELECT * FROM ' . $wpdb->prefix . 'wpbooklist_affiliates_settings' );
 
-			if ( null === $this->extension_settings->license || '' === $this->extension_settings->license ) {
+			if ( null === $this->extension_settings->repw || '' === $this->extension_settings->repw ) {
 
 				require_once ROOT_WPBL_TRANSLATIONS_DIR . 'class-wpbooklist-translations.php';
 				$trans = new WPBookList_Translations();
 
 				echo '
 				<div class="notice notice-success is-dismissible">
-					<form class="wpbooklist-extension-licence-key-dashboard-form" id="wpbooklist-extension-licence-key-dashboard-form-affiliates">
-						<p class="wpbooklist-extension-licence-key-dashboard-title">' . $trans->trans_617 . '</p>
-						<input id="wpbooklist-extension-licence-key-dashboard-input-affiliates" class="wpbooklist-extension-licence-key-dashboard-input" type="text" placeholder="' . $trans->trans_613 . '" value="' . $trans->trans_613 . '"></input>
-						<button data-ext="affiliates" id="wpbooklist-extension-licence-key-dashboard-button-affiliates" class="wpbooklist-extension-licence-key-dashboard-button">' . $trans->trans_616 . '</button>
+					<form class="wpbooklist-extension-genreric-key-dashboard-form" id="wpbooklist-extension-genreric-key-dashboard-form-affiliates">
+						<p class="wpbooklist-extension-genreric-key-dashboard-title">' . $trans->trans_617 . '</p>
+						<input id="wpbooklist-extension-genreric-key-dashboard-input-affiliates" class="wpbooklist-extension-genreric-key-dashboard-input" type="text" placeholder="' . $trans->trans_613 . '" value="' . $trans->trans_613 . '"></input>
+						<button data-ext="affiliates" id="wpbooklist-extension-genreric-key-dashboard-button-affiliates" class="wpbooklist-extension-genreric-key-dashboard-button">' . $trans->trans_616 . '</button>
 					</form>
 				</div>';
 			}
@@ -350,9 +494,9 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 			$sql_create_table1 = "CREATE TABLE {$wpdb->wpbooklist_affiliates_settings}
 			(
 				ID bigint(190) auto_increment,
-				license varchar(255),
+				repw varchar(255),
 				PRIMARY KEY  (ID),
-				KEY license (license)
+				KEY repw (repw)
 			) $charset_collate; ";
 
 			// If table doesn't exist, create table and add initial data to it.
@@ -360,7 +504,7 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 			if ( $test_name !== $wpdb->get_var( "SHOW TABLES LIKE '$test_name'" ) ) {
 				dbDelta( $sql_create_table1 );
 				$table_name = $wpdb->prefix . 'wpbooklist_affiliates_settings';
-				$wpdb->insert( $table_name, array( 'ID' => 1, 'license' => 'placeholder', ) );
+				$wpdb->insert( $table_name, array( 'ID' => 1, ) );
 			}
 		}
 	}

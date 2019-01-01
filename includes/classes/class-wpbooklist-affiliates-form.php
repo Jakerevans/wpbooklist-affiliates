@@ -3,9 +3,9 @@
  * WPBookList WPBookList_Affiliates_Form Submenu Class
  *
  * @author   Jake Evans
- * @category ??????
- * @package  ??????
- * @version  1
+ * @category admin
+ * @package  classes
+ * @version  1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
