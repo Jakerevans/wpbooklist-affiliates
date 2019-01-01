@@ -199,9 +199,6 @@ define( 'AFFILIATES_NONCES_ARRAY',
 	// Function that adds in the License Key Submission form on this Extension's entry on the plugins page.
 	add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $affiliates_general_functions, 'wpbooklist_affiliates_pluginspage_nonce_entry' ) );
 
-	// Function that loads up the menu page entry for this Extension.
-	add_filter( 'wpbooklist_add_sub_menu', array( $affiliates_general_functions, 'wpbooklist_affiliates_submenu' ) );
-
 	// Adding the function that will take our AFFILIATES_NONCES_ARRAY Constant from above and create actual nonces to be passed to Javascript functions.
 	add_action( 'init', array( $affiliates_general_functions, 'wpbooklist_affiliates_create_nonces' ) );
 
