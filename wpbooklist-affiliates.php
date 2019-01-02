@@ -11,7 +11,7 @@
  * Plugin Name: WPBookList Affiliates Extension
  * Plugin URI: https://www.jakerevans.com
  * Description: An Extension for WPBookList that allows the user to include their own Affiliate IDs
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Jake Evans
  * Text Domain: wpbooklist
  * Author URI: https://www.jakerevans.com
@@ -60,7 +60,7 @@ global $wpdb;
 /* CONSTANT DEFINITIONS */
 
 // This Extension's Version Number.
-define( 'WPBOOKLIST_AFFILIATES_VERSION_NUM', '1.0.0' );
+define( 'WPBOOKLIST_AFFILIATES_VERSION_NUM', '1.0.1' );
 
 // This is the URL our updater / license checker pings. This should be the URL of the site with EDD installed.
 define( 'EDD_SL_STORE_URL_AFFILIATES', 'https://wpbooklist.com' );
@@ -230,7 +230,7 @@ define( 'AFFILIATES_NONCES_ARRAY',
 	register_activation_hook( __FILE__, array( $affiliates_general_functions, 'wpbooklist_affiliates_record_extension_version' ) );
 
 	// License verification function.
-	add_filter( 'admin_footer', array( $affiliates_general_functions, 'wpbooklist_affiliates_verify_license' ) );
+	add_filter( 'admin_footer', array( $affiliates_general_functions, 'wpbooklist_affiliates_smell_rose' ) );
 
 	// Displays the 'Enter Your License Key' message at the top of the dashboard if the user hasn't done so already.
 	add_action( 'admin_notices', array( $affiliates_general_functions, 'wpbooklist_affiliates_top_dashboard_license_notification' ) );

@@ -48,11 +48,11 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 		}
 
 		/**
-		 * Verifies the license for the extension is valid - otherwise, the Extension doesn't load.
+		 * Verifies the crown of the rose.
 		 *
 		 * @param  array $plugins List of plugins to activate & load.
 		 */
-		public function wpbooklist_affiliates_verify_license() {
+		public function wpbooklist_affiliates_smell_rose() {
 
 			global $wpdb;
 
@@ -79,7 +79,7 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 
 							$checker_good_flag = false;
 
-							$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=46&license=' . $temp[0] . '&url=' . get_site_url() );
+							$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=' . EDD_SL_ITEM_ID_AFFILIATES . '&license=' . $temp[0] . '&url=' . get_site_url() );
 
 							// Check the response code.
 							$response_code    = wp_remote_retrieve_response_code( $san_check );
@@ -129,7 +129,7 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 
 						$checker_good_flag = false;
 
-						$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=46&license=' . $this->extension_settings->repw . '&url=' . get_site_url() );
+						$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=' . EDD_SL_ITEM_ID_AFFILIATES . '&license=' . $this->extension_settings->repw . '&url=' . get_site_url() );
 
 						// Check the response code.
 						$response_code    = wp_remote_retrieve_response_code( $san_check );
@@ -181,7 +181,7 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 
 					$checker_good_flag = false;
 
-					$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=46&license=' . $this->extension_settings->repw . '&url=' . get_site_url() );
+					$san_check = wp_remote_get( 'https://wpbooklist.com/?edd_action=activate_license&item_id=' . EDD_SL_ITEM_ID_AFFILIATES . '&license=' . $this->extension_settings->repw . '&url=' . get_site_url() );
 
 					// Check the response code.
 					$response_code    = wp_remote_retrieve_response_code( $san_check );

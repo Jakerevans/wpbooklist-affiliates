@@ -34,7 +34,7 @@ if ( ! class_exists( 'WPBookList_Affiliates_Update', false ) ) :
 		 */
 		public function wpbooklist_affiliates_update_kickoff() {
 
-			if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ) {
+			if ( ! class_exists( 'WPBookList_Affiliates_Update_Actual' ) ) {
 
 				// Load our custom updater if it doesn't already exist.
 				require_once( AFFILIATES_UPDATE_DIR . 'class-wpbooklist-affiliates-update-actual.php' );
@@ -51,7 +51,7 @@ if ( ! class_exists( 'WPBookList_Affiliates_Update', false ) ) :
 
 			// Setup the updater.
 			$edd_updater = new WPBookList_Affiliates_Update_Actual( EDD_SL_STORE_URL_AFFILIATES, AFFILIATES_ROOT_DIR . 'wpbooklist-affiliates.php', array(
-				'version' => '1.0.0',
+				'version' => WPBOOKLIST_AFFILIATES_VERSION_NUM,
 				'license' => $license_key,
 				'item_id' => EDD_SL_ITEM_ID_AFFILIATES,
 				'author'  => 'Pippin Williamson',
