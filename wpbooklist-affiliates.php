@@ -11,7 +11,7 @@
  * Plugin Name: WPBookList Affiliates Extension
  * Plugin URI: https://www.jakerevans.com
  * Description: An Extension for WPBookList that allows the user to include their own Affiliate IDs
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Jake Evans
  * Text Domain: wpbooklist
  * Author URI: https://www.jakerevans.com
@@ -60,7 +60,7 @@ global $wpdb;
 /* CONSTANT DEFINITIONS */
 
 // This Extension's Version Number.
-define( 'WPBOOKLIST_AFFILIATES_VERSION_NUM', '1.0.1' );
+define( 'WPBOOKLIST_AFFILIATES_VERSION_NUM', '1.0.2' );
 
 // This is the URL our updater / license checker pings. This should be the URL of the site with EDD installed.
 define( 'EDD_SL_STORE_URL_AFFILIATES', 'https://wpbooklist.com' );
@@ -71,8 +71,13 @@ define( 'EDD_SL_ITEM_ID_AFFILIATES', 46 );
 // Root plugin folder directory.
 define( 'AFFILIATES_ROOT_DIR', plugin_dir_path( __FILE__ ) );
 
-// Root WordPress Plugin Directory.
-define( 'AFFILIATES_ROOT_WP_PLUGINS_DIR', str_replace( '/wpbooklist-affiliates', '', plugin_dir_path( __FILE__ ) ) );
+// Root WordPress Plugin Directory. The If is for taking into account the update process - a temp folder gets created when updating, which temporarily replaces the 'wpbooklist-affiliates' folder.
+if ( false !== stripos( plugin_dir_path( __FILE__ ) , '/wpbooklist-affiliates' ) ) { 
+	define( 'AFFILIATES_ROOT_WP_PLUGINS_DIR', str_replace( '/wpbooklist-affiliates', '', plugin_dir_path( __FILE__ ) ) );
+} else {
+	$temp = explode( 'plugins/', plugin_dir_path( __FILE__ ) );
+	define( 'AFFILIATES_ROOT_WP_PLUGINS_DIR', $temp[0] . 'plugins/' );
+}
 
 // Root plugin folder URL .
 define( 'AFFILIATES_ROOT_URL', plugins_url() . '/wpbooklist-affiliates/' );
