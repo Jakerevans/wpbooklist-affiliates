@@ -11,7 +11,7 @@
  * Plugin Name: WPBookList Affiliates Extension
  * Plugin URI: https://www.jakerevans.com
  * Description: An Extension for WPBookList that allows the user to include their own Affiliate IDs
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Jake Evans
  * Text Domain: wpbooklist
  * Author URI: https://www.jakerevans.com
@@ -60,7 +60,7 @@ global $wpdb;
 /* CONSTANT DEFINITIONS */
 
 // This Extension's Version Number.
-define( 'WPBOOKLIST_AFFILIATES_VERSION_NUM', '1.0.2' );
+define( 'WPBOOKLIST_AFFILIATES_VERSION_NUM', '1.0.3' );
 
 // This is the URL our updater / license checker pings. This should be the URL of the site with EDD installed.
 define( 'EDD_SL_STORE_URL_AFFILIATES', 'https://wpbooklist.com' );
@@ -116,7 +116,7 @@ define( 'AFFILIATES_ROOT_INCLUDES_UI', AFFILIATES_ROOT_DIR . 'includes/ui/' );
 define( 'AFFILIATES_ROOT_INCLUDES_UI_ADMIN_DIR', AFFILIATES_ROOT_DIR . 'includes/ui/admin/' );
 
 if ( ! defined( 'WPBOOKLIST_VERSION_NUM' ) ) {
-	define( 'WPBOOKLIST_VERSION_NUM', '6.1.2' );
+	define( 'WPBOOKLIST_VERSION_NUM', '6.1.5' );
 }
 
 // Root WPBL Dir.

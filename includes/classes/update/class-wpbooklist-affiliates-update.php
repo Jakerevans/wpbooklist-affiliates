@@ -42,37 +42,28 @@ if ( ! class_exists( 'WPBookList_Affiliates_Update', false ) ) :
 
 			global $wpdb;
 
-			// Get license key from plugin options, if it's already been saved. If it has, don't display anything.
-			$extension_settings = $wpdb->get_row( 'SELECT * FROM ' . $wpdb->prefix . 'wpbooklist_affiliates_settings' );
-			$extension_settings = explode( '---', $extension_settings->repw);
+			// Checking if table exists.
+			$test_name = $wpdb->prefix . 'wpbooklist_affiliates_settings';
+			if ( $test_name === $wpdb->get_var( "SHOW TABLES LIKE '$test_name'" ) ) {
 
-			// Retrieve our license key from the DB.
-			$license_key = $extension_settings[0];
+				// Get license key from plugin options, if it's already been saved. If it has, don't display anything.
+				$extension_settings = $wpdb->get_row( 'SELECT * FROM ' . $wpdb->prefix . 'wpbooklist_affiliates_settings' );
+				$extension_settings = explode( '---', $extension_settings->repw);
 
-			// Setup the updater.
-			$edd_updater = new WPBookList_Affiliates_Update_Actual( EDD_SL_STORE_URL_AFFILIATES, AFFILIATES_ROOT_DIR . 'wpbooklist-affiliates.php', array(
-				'version' => WPBOOKLIST_AFFILIATES_VERSION_NUM,
-				'license' => $license_key,
-				'item_id' => EDD_SL_ITEM_ID_AFFILIATES,
-				'author'  => 'Pippin Williamson',
-				'url'     => home_url(),
-				'beta'    => false,
-			) );
+				// Retrieve our license key from the DB.
+				$license_key = $extension_settings[0];
 
-			/*
-			$to_send = array(
-				'slug'   => $edd_updater->slug,
-				'is_ssl' => is_ssl(),
-				'fields' => array(
-					'banners' => array(),
-					'reviews' => false,
-					'icons'   => array(),
-				),
-			);
+				// Setup the updater.
+				$edd_updater = new WPBookList_Affiliates_Update_Actual( EDD_SL_STORE_URL_AFFILIATES, AFFILIATES_ROOT_DIR . 'wpbooklist-affiliates.php', array(
+					'version' => WPBOOKLIST_AFFILIATES_VERSION_NUM,
+					'license' => $license_key,
+					'item_id' => EDD_SL_ITEM_ID_AFFILIATES,
+					'author'  => 'Pippin Williamson',
+					'url'     => home_url(),
+					'beta'    => false,
+				) );
 
-			$edd_updater->api_request( 'plugin_information', $to_send );
-			*/
-
+			}
 		}
 	}
 

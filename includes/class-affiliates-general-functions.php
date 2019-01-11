@@ -152,7 +152,7 @@ if ( ! class_exists( 'Affiliates_General_Functions', false ) ) :
 								$this->date     = $utilities_date->wpbooklist_get_date_via_current_time( 'timestamp' );
 
 								$data         = array(
-									$san_checkthis->extension_settings->repw . '---aod---' . $this->date,
+									$this->extension_settings->repw . '---aod---' . $this->date,
 								);
 								$format       = array( '%s' );
 								$where        = array( 'ID' => 1 );
